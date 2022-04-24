@@ -16,12 +16,20 @@ def main(poke_list):
         pokemons = [row for row in r]
 
     choiced = random.choice(pokemons)
-    answer = {
+    target = {
         "name": choiced[0],
         "type_01": choiced[1],
         "type_02": choiced[2],
     }
-    print(answer)
+    print(target)
+
+    # 対話インタフェース
+    answer = ""
+    cnt = 0
+    while answer != target["name"]:
+        cnt += 1
+        answer = input("> ")
+    print("\n{}手で正解！".format(cnt))
 
 
 if __name__ == "__main__":
