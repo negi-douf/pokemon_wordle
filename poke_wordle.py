@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import csv
+import random
 
 
 def main(poke_list):
@@ -9,7 +11,17 @@ def main(poke_list):
     Args:
         poke_list (str): ポケモンのリスト (csvファイルのパス)
     """
-    pass
+    with open(poke_list, "r", encoding="utf-8") as f:
+        r = csv.reader(f)
+        pokemons = [row for row in r]
+
+    choiced = random.choice(pokemons)
+    answer = {
+        "name": choiced[0],
+        "type_01": choiced[1],
+        "type_02": choiced[2],
+    }
+    print(answer)
 
 
 if __name__ == "__main__":
