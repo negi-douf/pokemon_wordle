@@ -6,11 +6,12 @@ import csv
 import random
 
 
-def main(poke_list):
+def main(poke_list, debug=False):
     """Main tasks.
 
     Args:
         poke_list (str): ポケモンのリスト (csvファイルのパス)
+        debug (:obj:`bool`, optional): デバッグモードの有効/無効を表すフラグ
     """
     with open(poke_list, "r", encoding="utf-8") as f:
         r = csv.reader(f)
@@ -22,27 +23,28 @@ def main(poke_list):
         "type_01": choiced[1],
         "type_02": choiced[2],
     }
-    print(target)
+    if debug:
+        print(target)
 
     # 対話インタフェース
+    cl.init(autoreset=True)
     print("help: ゲームのルールを表示")
     print("quit: 終了\n")
-    cl.init(autoreset=True)
     answer = ""
-    cnt = 0
+    count = 0
     while answer != target["name"]:
         answer = input("> ")
         if answer == "quit":
-            print("正解は{}でした！".format(target["name"]))
-            exit()
+            print("正解は{}でした。".format(target["name"]))
+            return
         elif answer == "help":
             guide()
         elif len(answer) != 5:
             print("回答は5文字で入力してください。")
         else:
             judge(target["name"], answer)
-            cnt += 1
-    print("\n{}手目で正解！".format(cnt))
+            count += 1
+    print("\n{}手目で正解！".format(count))
 
 
 def guide():
@@ -62,6 +64,9 @@ def judge(target, answer):
     Args:
         target (str): 正解の文字列
         answer (str): 回答
+
+    Raises:
+        ValueError: targetとanswerの文字数が異なる場合
     """
     if len(target) != len(answer):
         raise ValueError("targetとanswerの文字数が一致しません。")
@@ -106,5 +111,6 @@ def judge(target, answer):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="5文字のポケモンの名前を当てるゲームです！")
     parser.add_argument("list", type=str, help="ポケモンのリスト (csvファイルのパス)")
+    parser.add_argument("--debug", action="store_true", help="デバッグモードで実行する")
     args = parser.parse_args()
-    main(args.list)
+    main(args.list, args.debug)
