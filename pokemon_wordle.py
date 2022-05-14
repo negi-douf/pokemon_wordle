@@ -143,6 +143,7 @@ def detect_greens(target, answer):
 
 def detect_yellows(remaining, answer, is_green_list):
     """Detect yellow characters from answer.
+    回答の文字列から「文字のみ一致」を検出する。
 
     Args:
         remaining (:obj:`list` of :obj:`str`): 完全一致を取り除いた文字の配列
@@ -163,6 +164,20 @@ def detect_yellows(remaining, answer, is_green_list):
         else:
             is_yellow_list.append(False)
     return is_yellow_list
+
+
+def call_ai(pokemons):
+    """Have AI answer.
+    AIに回答させる。
+
+    Args:
+        pokemons (:obj:`list` of :obj:`list`): 全ポケモンのリスト
+
+    Returns:
+        str: 回答
+    """
+    choiced = random.choice(pokemons)
+    return choiced[0]
 
 
 if __name__ == "__main__":
