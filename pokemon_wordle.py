@@ -28,9 +28,11 @@ def main(poke_list, debug=False):
 
     cl.init(autoreset=True)
     print("help: ゲームのルールを表示")
+    print("hint: タイプのヒントを表示")
     print("quit: 終了\n")
     answer = ""
     count = 0
+    is_first_hint = True
     while answer != target["name"]:
         answer = input("> ")
         if answer == "quit":
@@ -38,6 +40,9 @@ def main(poke_list, debug=False):
             return
         elif answer == "help":
             guide()
+        elif answer == "hint":
+            hint(target, is_first_hint)
+            is_first_hint = False
         elif len(answer) != 5:
             print("回答は5文字で入力してください。")
         else:
@@ -54,6 +59,23 @@ def guide():
     print(cl.Fore.YELLOW + "文字だけ合っていたら黄色で、")
     print(cl.Fore.GREEN + "文字も位置も合っていたら緑色で、")
     print(cl.Fore.WHITE + "違っていたら白色の \"・\" で表示します。\n")
+
+
+def hint(target, is_first_hint):
+    """Display hints.
+    ヒントを表示する。
+
+    Args:
+        target (dict): 正解のポケモンの情報
+        is_first_hint (bool): 1回目のヒントかどうか
+    """
+    if is_first_hint:
+        print("type_01: {}\n".format(target["type_01"]))
+    else:
+        type_02 = target["type_02"]
+        if not type_02:
+            type_02 = "なし"
+        print("type_01: {}, type_02: {}\n".format(target["type_01"], type_02))
 
 
 def judge(target, answer):
