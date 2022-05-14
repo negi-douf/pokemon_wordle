@@ -6,12 +6,13 @@ import csv
 import random
 
 
-def main(poke_list, debug=False):
+def main(poke_list, debug=False, vs=False):
     """Main tasks.
 
     Args:
         poke_list (str): ポケモンのリスト (csvファイルのパス)
         debug (:obj:`bool`, optional): デバッグモードの有効/無効を表すフラグ
+        vs (:obj:`bool`, optional): コンピュータとの対戦モードの有効/無効を表すフラグ
     """
     with open(poke_list, "r", encoding="utf-8") as f:
         r = csv.reader(f)
@@ -28,22 +29,39 @@ def main(poke_list, debug=False):
 
     cl.init(autoreset=True)
     print("help: ゲームのルールを表示")
+    print("hint: タイプのヒントを表示")
     print("quit: 終了\n")
     answer = ""
     count = 0
+    is_first_hint = True
+    is_players_turn = True
     while answer != target["name"]:
-        answer = input("> ")
+        if is_players_turn:
+            answer = input("> ")
+        else:
+            print("コンピュータのターンです。")
+            answer = call_ai(pokemons)
+            print("> {}".format(answer))
         if answer == "quit":
             print("正解は{}でした。".format(target["name"]))
             return
         elif answer == "help":
             guide()
+        elif answer == "hint":
+            hint(target, is_first_hint)
+            is_first_hint = False
         elif len(answer) != 5:
             print("回答は5文字で入力してください。")
         else:
             judge(target["name"], answer)
             count += 1
+            if vs:
+                is_players_turn = not is_players_turn
     print("\n{}手目で正解！".format(count))
+    if is_players_turn:
+        print("コンピュータの勝利！")
+    else:
+        print("プレイヤーの勝利！")
 
 
 def guide():
@@ -54,6 +72,23 @@ def guide():
     print(cl.Fore.YELLOW + "文字だけ合っていたら黄色で、")
     print(cl.Fore.GREEN + "文字も位置も合っていたら緑色で、")
     print(cl.Fore.WHITE + "違っていたら白色の \"・\" で表示します。\n")
+
+
+def hint(target, is_first_hint):
+    """Display hints.
+    ヒントを表示する。
+
+    Args:
+        target (dict): 正解のポケモンの情報
+        is_first_hint (bool): 1回目のヒントかどうか
+    """
+    if is_first_hint:
+        print("type_01: {}\n".format(target["type_01"]))
+    else:
+        type_02 = target["type_02"]
+        if not type_02:
+            type_02 = "なし"
+        print("type_01: {}, type_02: {}\n".format(target["type_01"], type_02))
 
 
 def judge(target, answer):
@@ -121,6 +156,7 @@ def detect_greens(target, answer):
 
 def detect_yellows(remaining, answer, is_green_list):
     """Detect yellow characters from answer.
+    回答の文字列から「文字のみ一致」を検出する。
 
     Args:
         remaining (:obj:`list` of :obj:`str`): 完全一致を取り除いた文字の配列
@@ -143,9 +179,24 @@ def detect_yellows(remaining, answer, is_green_list):
     return is_yellow_list
 
 
+def call_ai(pokemons):
+    """Have AI answer.
+    AIに回答させる。
+
+    Args:
+        pokemons (:obj:`list` of :obj:`list`): 全ポケモンのリスト
+
+    Returns:
+        str: 回答
+    """
+    choiced = random.choice(pokemons)
+    return choiced[0]
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="5文字のポケモンの名前を当てるゲームです！")
     parser.add_argument("list", type=str, help="ポケモンのリスト (csvファイルのパス)")
     parser.add_argument("--debug", action="store_true", help="デバッグモードで実行する")
+    parser.add_argument("--vs", action="store_true", help="コンピュータとの対戦モードで実行する")
     args = parser.parse_args()
-    main(args.list, args.debug)
+    main(args.list, args.debug, args.vs)
