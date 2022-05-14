@@ -26,7 +26,6 @@ def main(poke_list, debug=False):
     if debug:
         print(target)
 
-    # 対話インタフェース
     cl.init(autoreset=True)
     print("help: ゲームのルールを表示")
     print("quit: 終了\n")
@@ -75,37 +74,73 @@ def judge(target, answer):
     for c in target:
         remaining.append(c)
 
-    # 完全一致を検出
-    is_green = []
-    for i in range(len(answer)):
-        if target[i] == answer[i]:
-            is_green.append(True)
-            remaining[i] = ""
-        else:
-            is_green.append(False)
+    is_green_list, remaining = detect_greens(target, answer)
+    is_yellow_list = detect_yellows(remaining, answer, is_green_list)
 
-    # 文字だけ合っているものを検出
-    is_yellow = []
-    for i, c in enumerate(answer):
-        if is_green[i]:
-            is_yellow.append(False)
-            continue
-        elif c in remaining:
-            is_yellow.append(True)
-            remaining[remaining.index(c)] = ""
-        else:
-            is_yellow.append(False)
-
-    # 色付きで出力
     print("  ", end="")
     for i, c in enumerate(answer):
-        if is_green[i]:
+        if is_green_list[i]:
             print(cl.Fore.GREEN + c, end="")
-        elif is_yellow[i]:
+        elif is_yellow_list[i]:
             print(cl.Fore.YELLOW + c, end="")
         else:
             print(cl.Fore.WHITE + "・", end="")
     print()
+
+
+def detect_greens(target, answer):
+    """Detect green characters from answer.
+    回答の文字列から完全一致の文字を検出する。
+
+    Args:
+        target (str): 正解の文字列
+        answer (str): 回答
+
+    Returns:
+        :obj:`list` of :obj:`bool`: その位置の文字が完全一致かどうかを表す配列
+        :obj:`list` of :obj:`str`: ヒットしなかった文字だけが残った配列
+
+    Note:
+        戻り値の例:
+            [False, True, False, False, True]
+            ["サ", "", "ダ", "ー", ""]
+    """
+    remaining = []
+    for c in target:
+        remaining.append(c)
+
+    is_green_list = []
+    for i in range(len(answer)):
+        if target[i] == answer[i]:
+            is_green_list.append(True)
+            remaining[i] = ""
+        else:
+            is_green_list.append(False)
+    return is_green_list, remaining
+
+
+def detect_yellows(remaining, answer, is_green_list):
+    """Detect yellow characters from answer.
+
+    Args:
+        remaining (:obj:`list` of :obj:`str`): 完全一致を取り除いた文字の配列
+        answer (str): 回答
+
+    Returns:
+        :obj:`list` of :obj:`bool`: その位置の answerの文字が remainingに含まれて
+                いるかどうかを表す配列
+    """
+    is_yellow_list = []
+    for i, c in enumerate(answer):
+        if is_green_list[i]:
+            is_yellow_list.append(False)
+            continue
+        elif c in remaining:
+            is_yellow_list.append(True)
+            remaining[remaining.index(c)] = ""
+        else:
+            is_yellow_list.append(False)
+    return is_yellow_list
 
 
 if __name__ == "__main__":
