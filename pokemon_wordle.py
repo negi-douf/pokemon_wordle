@@ -6,12 +6,13 @@ import csv
 import random
 
 
-def main(poke_list, debug=False):
+def main(poke_list, debug=False, vs=False):
     """Main tasks.
 
     Args:
         poke_list (str): ポケモンのリスト (csvファイルのパス)
         debug (:obj:`bool`, optional): デバッグモードの有効/無効を表すフラグ
+        vs (:obj:`bool`, optional): コンピュータとの対戦モードの有効/無効を表すフラグ
     """
     with open(poke_list, "r", encoding="utf-8") as f:
         r = csv.reader(f)
@@ -33,8 +34,14 @@ def main(poke_list, debug=False):
     answer = ""
     count = 0
     is_first_hint = True
+    is_players_turn = True
     while answer != target["name"]:
-        answer = input("> ")
+        if is_players_turn:
+            answer = input("> ")
+        else:
+            print("コンピュータのターンです。")
+            answer = call_ai(pokemons)
+            print("> {}".format(answer))
         if answer == "quit":
             print("正解は{}でした。".format(target["name"]))
             return
@@ -48,7 +55,13 @@ def main(poke_list, debug=False):
         else:
             judge(target["name"], answer)
             count += 1
+            if vs:
+                is_players_turn = not is_players_turn
     print("\n{}手目で正解！".format(count))
+    if is_players_turn:
+        print("コンピュータの勝利！")
+    else:
+        print("プレイヤーの勝利！")
 
 
 def guide():
@@ -184,5 +197,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="5文字のポケモンの名前を当てるゲームです！")
     parser.add_argument("list", type=str, help="ポケモンのリスト (csvファイルのパス)")
     parser.add_argument("--debug", action="store_true", help="デバッグモードで実行する")
+    parser.add_argument("--vs", action="store_true", help="コンピュータとの対戦モードで実行する")
     args = parser.parse_args()
-    main(args.list, args.debug)
+    main(args.list, args.debug, args.vs)
