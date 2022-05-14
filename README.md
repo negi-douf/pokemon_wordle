@@ -6,7 +6,7 @@
 
 ## Usage
 ```
-python3 pokemon_wordle.py [-h] [--debug] list
+python3 pokemon_wordle.py [-h] [--debug] [--vs] list
 ```
 
 ### Args
@@ -20,6 +20,8 @@ python3 pokemon_wordle.py [-h] [--debug] list
 
 * --debug  
 このフラグを付けて実行した場合、実行時に正解を表示します。
+* --vs  
+このフラグを付けて実行した場合、コンピュータとの対戦モードで実行します。
 
 ## Other
 このツールは個人が開発したものであり、株式会社ポケモン様をはじめとした公式団体とは一切関係ありません。
