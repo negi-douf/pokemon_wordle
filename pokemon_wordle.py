@@ -58,10 +58,11 @@ def main(poke_list, debug=False, vs=False):
             if vs:
                 is_players_turn = not is_players_turn
     print("\n{}手目で正解！".format(count))
-    if is_players_turn:
-        print("コンピュータの勝利！")
-    else:
-        print("プレイヤーの勝利！")
+    if vs:
+        if is_players_turn:
+            print("コンピュータの勝利！")
+        else:
+            print("プレイヤーの勝利！")
 
 
 def guide():
