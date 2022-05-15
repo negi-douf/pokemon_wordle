@@ -6,13 +6,13 @@ import csv
 import random
 
 
-def main(poke_list, debug=False, vs=False):
+def main(poke_list, is_debug=False, is_vs=False):
     """Main tasks.
 
     Args:
         poke_list (str): ポケモンのリスト (csvファイルのパス)
-        debug (:obj:`bool`, optional): デバッグモードの有効/無効を表すフラグ
-        vs (:obj:`bool`, optional): コンピュータとの対戦モードの有効/無効を表すフラグ
+        is_debug (:obj:`bool`, optional): デバッグモードの有効/無効を表すフラグ
+        is_vs (:obj:`bool`, optional): コンピュータとの対戦モードの有効/無効を表すフラグ
     """
     with open(poke_list, "r", encoding="utf-8") as f:
         r = csv.reader(f)
@@ -24,7 +24,7 @@ def main(poke_list, debug=False, vs=False):
         "type_01": choiced[1],
         "type_02": choiced[2],
     }
-    if debug:
+    if is_debug:
         print(target)
 
     cl.init(autoreset=True)
@@ -55,10 +55,10 @@ def main(poke_list, debug=False, vs=False):
         else:
             judge(target["name"], answer)
             count += 1
-            if vs:
+            if is_vs:
                 is_players_turn = not is_players_turn
     print("\n{}手目で正解！".format(count))
-    if vs:
+    if is_vs:
         if is_players_turn:
             print("コンピュータの勝利！")
         else:
