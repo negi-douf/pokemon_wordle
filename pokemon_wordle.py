@@ -211,7 +211,7 @@ def main(args: Namespace) -> None:
 def arg_parser() -> Namespace:
     parser = ArgumentParser(description="5文字のポケモンの名前を当てるゲームです！")
     parser.add_argument("list", type=str, help="ポケモンのリスト (csvファイルのパス)")
-    parser.add_argument("--debug", action="store_true",  help="デバッグモードで実行する")
+    parser.add_argument("--debug", action="store_true", help="デバッグモードで実行する")
     parser.add_argument("--vs", action="store_true", help="コンピュータとの対戦モードで実行する")
     args = parser.parse_args()
     return args
