@@ -3,7 +3,6 @@
 import random
 from argparse import ArgumentParser, Namespace
 from dataclasses import dataclass
-from typing import Any
 
 import colorama as cl
 from dataclass_csv import DataclassReader
@@ -149,7 +148,7 @@ def call_ai(pokemons:list[Pokemon]) -> str:
 
 def load_pokemons(filepath: str) -> list[Pokemon]:
     with open(filepath, "r", encoding="utf-8") as f:
-        reader:list[Any] = DataclassReader(f,Pokemon)  # type: ignore
+        reader = DataclassReader(f,Pokemon)
         pokemons = [row for row in reader]
     return pokemons
 
