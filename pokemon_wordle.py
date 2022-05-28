@@ -30,7 +30,7 @@ def hint(pokemon: Pokemon, is_first_hint: bool):
     ヒントを表示する。
 
     Args:
-        target (dict): 正解のポケモンの情報
+        pokemon (Pokemon): 正解のポケモンの情報
         is_first_hint (bool): 1回目のヒントかどうか
     """
     type_01 = pokemon.type_01
@@ -49,7 +49,7 @@ def judge(pokemon_name: str, answer: str) -> None:
     文字列が正解かどうかを判定し、結果を色付きで出力する。
 
     Args:
-        target (str): 正解の文字列
+        pokemon_name (str): 正解の文字列
         answer (str): 回答
 
     Raises:
@@ -157,9 +157,7 @@ def main(args: Namespace) -> None:
     """Main tasks.
 
     Args:
-        poke_list (str): ポケモンのリスト (csvファイルのパス)
-        is_debug (:obj:`bool`, optional): デバッグモードの有効/無効を表すフラグ
-        is_vs (:obj:`bool`, optional): コンピュータとの対戦モードの有効/無効を表すフラグ
+       args (:obj:Namespace): 実行時に渡された引数のリスト
     """
     filepath: str = args.list
     is_debug: bool = args.debug
