@@ -17,7 +17,7 @@ def guide():
     print(cl.Fore.WHITE + "違っていたら白色の \"・\" で表示します。\n")
 
 
-def hint(target: dict[str,str], is_first_hint: bool):
+def hint(target: dict[str, str], is_first_hint: bool):
     """Display hints.
     ヒントを表示する。
 
@@ -34,7 +34,7 @@ def hint(target: dict[str,str], is_first_hint: bool):
         print("type_01: {}, type_02: {}\n".format(target["type_01"], type_02))
 
 
-def judge(target:str, answer:str) -> None:
+def judge(target: str, answer: str) -> None:
     """Judge if the answer is correct.
     文字列が正解かどうかを判定し、結果を色付きで出力する。
 
@@ -66,7 +66,7 @@ def judge(target:str, answer:str) -> None:
     print()
 
 
-def detect_greens(target:str, answer:str) -> tuple[list[bool],list[str]]:
+def detect_greens(target: str, answer: str) -> tuple[list[bool], list[str]]:
     """Detect green characters from answer.
     回答の文字列から完全一致の文字を検出する。
 
@@ -87,7 +87,6 @@ def detect_greens(target:str, answer:str) -> tuple[list[bool],list[str]]:
     for c in target:
         remaining.append(c)
 
-
     is_green_list: list[bool] = []
     for i in range(len(answer)):
         if target[i] == answer[i]:
@@ -98,7 +97,7 @@ def detect_greens(target:str, answer:str) -> tuple[list[bool],list[str]]:
     return is_green_list, remaining
 
 
-def detect_yellows(remaining: list[str], answer:str, is_green_list: list[bool]) -> list[bool]:
+def detect_yellows(remaining: list[str], answer: str, is_green_list: list[bool]) -> list[bool]:
     """Detect yellow characters from answer.
     回答の文字列から「文字のみ一致」を検出する。
 
@@ -123,7 +122,7 @@ def detect_yellows(remaining: list[str], answer:str, is_green_list: list[bool]) 
     return is_yellow_list
 
 
-def call_ai(pokemons:list[list[str]]) -> str:
+def call_ai(pokemons: list[list[str]]) -> str:
     """Have AI answer.
     AIに回答させる。
 
@@ -136,7 +135,8 @@ def call_ai(pokemons:list[list[str]]) -> str:
     choiced = random.choice(pokemons)
     return choiced[0]
 
-def main(poke_list:str, is_debug: bool=False, is_vs: bool=False) -> None:
+
+def main(poke_list: str, is_debug: bool = False, is_vs: bool = False) -> None:
     """Main tasks.
 
     Args:
@@ -193,6 +193,7 @@ def main(poke_list:str, is_debug: bool=False, is_vs: bool=False) -> None:
             print("コンピュータの勝利！")
         else:
             print("プレイヤーの勝利！")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="5文字のポケモンの名前を当てるゲームです！")
