@@ -44,7 +44,7 @@ def hint(pokemon: Pokemon, is_first_hint: bool):
         print("type_01: {}, type_02: {}\n".format(type_01, type_02))
 
 
-def judge(pokemon_name:str, answer:str) -> None:
+def judge(pokemon_name: str, answer: str) -> None:
     """Judge if the answer is correct.
     文字列が正解かどうかを判定し、結果を色付きで出力する。
 
@@ -76,7 +76,7 @@ def judge(pokemon_name:str, answer:str) -> None:
     print()
 
 
-def detect_greens(target:str, answer:str) -> tuple[list[bool],list[str]]:
+def detect_greens(target: str, answer: str) -> tuple[list[bool], list[str]]:
     """Detect green characters from answer.
     回答の文字列から完全一致の文字を検出する。
 
@@ -97,7 +97,6 @@ def detect_greens(target:str, answer:str) -> tuple[list[bool],list[str]]:
     for c in target:
         remaining.append(c)
 
-
     is_green_list: list[bool] = []
     for i in range(len(answer)):
         if target[i] == answer[i]:
@@ -108,7 +107,7 @@ def detect_greens(target:str, answer:str) -> tuple[list[bool],list[str]]:
     return is_green_list, remaining
 
 
-def detect_yellows(remaining: list[str], answer:str, is_green_list: list[bool]) -> list[bool]:
+def detect_yellows(remaining: list[str], answer: str, is_green_list: list[bool]) -> list[bool]:
     """Detect yellow characters from answer.
     回答の文字列から「文字のみ一致」を検出する。
 
@@ -133,7 +132,7 @@ def detect_yellows(remaining: list[str], answer:str, is_green_list: list[bool]) 
     return is_yellow_list
 
 
-def call_ai(pokemons:list[Pokemon]) -> str:
+def call_ai(pokemons: list[Pokemon]) -> str:
     """Have AI answer.
     AIに回答させる。
 
@@ -146,9 +145,10 @@ def call_ai(pokemons:list[Pokemon]) -> str:
     choiced_pokemon = random.choice(pokemons)
     return choiced_pokemon.name
 
+
 def load_pokemons(filepath: str) -> list[Pokemon]:
     with open(filepath, "r", encoding="utf-8") as f:
-        reader = DataclassReader(f,Pokemon)
+        reader = DataclassReader(f, Pokemon)
         pokemons = [row for row in reader]
     return pokemons
 
@@ -208,6 +208,7 @@ def main(args: Namespace) -> None:
         else:
             print("プレイヤーの勝利！")
 
+
 def arg_parser() -> Namespace:
     parser = ArgumentParser(description="5文字のポケモンの名前を当てるゲームです！")
     parser.add_argument("list", type=str, help="ポケモンのリスト (csvファイルのパス)")
@@ -215,6 +216,7 @@ def arg_parser() -> Namespace:
     parser.add_argument("--vs", action="store_true", help="コンピュータとの対戦モードで実行する")
     args = parser.parse_args()
     return args
+
 
 if __name__ == "__main__":
     args = arg_parser()
