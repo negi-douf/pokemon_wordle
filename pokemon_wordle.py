@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import random
+import re
 from argparse import ArgumentParser, Namespace
 from dataclasses import dataclass
+from enum import Enum
 
-import colorama as cl
+from colorama import Fore
+from colorama import init as colorama_init
 from dataclass_csv import DataclassReader
 
 
@@ -15,135 +18,147 @@ class Pokemon:
     type_02: str = ""
 
 
-def guide():
-    """Display a guide.
-    ゲームのルールを表示する。
-    """
-    print("5文字のポケモンの名前を当てるゲームです！\n")
-    print(cl.Fore.YELLOW + "文字だけ合っていたら黄色で、")
-    print(cl.Fore.GREEN + "文字も位置も合っていたら緑色で、")
-    print(cl.Fore.WHITE + "違っていたら白色の \"・\" で表示します。\n")
+class SystemCommand(Enum):
+    HELP = "help"
+    QUIT = "quit"
+    HINT = "hint"
+        
 
+class Game():
+    def __init__(self, answer_pokemon: Pokemon) -> None:
+        self.round= 0
+        self.is_first_hint = True
+        self.answer_pokemon = answer_pokemon
+        self.finished = False
+        self.print_instructions()
+        colorama_init(autoreset=True)
 
-def hint(pokemon: Pokemon, is_first_hint: bool):
-    """Display hints.
-    ヒントを表示する。
+    def print_instructions(self) -> None:
+        print("help: ゲームのルールを表示")
+        print("hint: タイプのヒントを表示")
+        print("quit: 終了\n")
 
-    Args:
-        pokemon (Pokemon): 正解のポケモンの情報
-        is_first_hint (bool): 1回目のヒントかどうか
-    """
-    type_01 = pokemon.type_01
-    type_02 = pokemon.type_02
-    if pokemon.type_02 == '':
-        type_02 = "なし"
+    def print_hint(self) -> None:
+        type_01 = self.answer_pokemon.type_01
+        type_02 = self.answer_pokemon.type_02
+        if type_02 == '':
+            type_02 = "なし"
 
-    if is_first_hint:
-        print("type_01: {}\n".format(type_01))
-    else:
-        print("type_01: {}, type_02: {}\n".format(type_01, type_02))
-
-
-def judge(pokemon_name: str, answer: str) -> None:
-    """Judge if the answer is correct.
-    文字列が正解かどうかを判定し、結果を色付きで出力する。
-
-    Args:
-        pokemon_name (str): 正解の文字列
-        answer (str): 回答
-
-    Raises:
-        ValueError: targetとanswerの文字数が異なる場合
-    """
-    if len(pokemon_name) != len(answer):
-        raise ValueError("targetとanswerの文字数が一致しません。")
-
-    remaining: list[str] = []
-    for c in pokemon_name:
-        remaining.append(c)
-
-    is_green_list, remaining = detect_greens(pokemon_name, answer)
-    is_yellow_list = detect_yellows(remaining, answer, is_green_list)
-
-    print("  ", end="")
-    for i, c in enumerate(answer):
-        if is_green_list[i]:
-            print(cl.Fore.GREEN + c, end="")
-        elif is_yellow_list[i]:
-            print(cl.Fore.YELLOW + c, end="")
+        if self.is_first_hint:
+            print(f"type_01: {type_01}\n".format(type_01))
+            self.is_first_hint = False
         else:
-            print(cl.Fore.WHITE + "・", end="")
-    print()
+            print(f"type_01: {type_01}, type_02: {type_02}\n")
+
+    def print_help(self) -> None:
+        print("5文字のポケモンの名前を当てるゲームです！\n")
+        print(Fore.YELLOW + "文字だけ合っていたら黄色で、")
+        print(Fore.GREEN + "文字も位置も合っていたら緑色で、")
+        print(Fore.WHITE + "違っていたら白色の \"・\" で表示します。\n")
+
+    def quit(self) -> None:
+        print(f"正解は{self.answer_pokemon.name}でした。")
+        self.finished = True
+
+    def exec_systemcommand(self, word: str) -> None:
+        if word == SystemCommand.QUIT.value:
+            self.quit()
+        elif word == SystemCommand.HELP.value:
+            self.print_help()
+        elif word == SystemCommand.HINT.value:
+            self.print_hint()
 
 
-def detect_greens(target: str, answer: str) -> tuple[list[bool], list[str]]:
-    """Detect green characters from answer.
-    回答の文字列から完全一致の文字を検出する。
+    def print_winner(self):
+        pass
 
-    Args:
-        target (str): 正解の文字列
-        answer (str): 回答
+    def move_next_turn(self) -> None:
+        pass
 
-    Returns:
-        :obj:`list` of :obj:`bool`: その位置の文字が完全一致かどうかを表す配列
-        :obj:`list` of :obj:`str`: ヒットしなかった文字だけが残った配列
+    def answer_of_this_turn(self) -> str:
+        return ''
 
-    Note:
-        戻り値の例:
-            [False, True, False, False, True]
-            ["サ", "", "ダ", "ー", ""]
-    """
-    remaining: list[str] = []
-    for c in target:
-        remaining.append(c)
-
-    is_green_list: list[bool] = []
-    for i in range(len(answer)):
-        if target[i] == answer[i]:
-            is_green_list.append(True)
-            remaining[i] = ""
+    def is_green_match(self,answer_char: str,index: int) -> bool:
+        pokemon_name = self.answer_pokemon.name
+        if pokemon_name[index] == answer_char:
+            return True
+        return False
+    
+    def is_yellow_match(self,answer_char: str) -> bool:
+        pokemon_name = self.answer_pokemon.name
+        if re.search(answer_char,pokemon_name):
+            return True
+        return False
+    
+    def print_colored_feedback_per_char(self,char: str,index: int) -> None:
+        if self.is_green_match(char,index):
+            print(Fore.GREEN + char, end='')
+        elif self.is_yellow_match(char):
+            print(Fore.YELLOW + char, end='')
         else:
-            is_green_list.append(False)
-    return is_green_list, remaining
+            print(Fore.WHITE + char, end='')
+
+    def print_colored_feedback(self, answer: str) -> None:
+        pokemon_name = self.answer_pokemon.name
+        if len(pokemon_name) != len(answer):
+            raise ValueError("targetとanswerの文字数が一致しません。")
+
+        for index,answer_char in enumerate(answer):
+            self.print_colored_feedback_per_char(answer_char,index)
+        print()
 
 
-def detect_yellows(remaining: list[str], answer: str, is_green_list: list[bool]) -> list[bool]:
-    """Detect yellow characters from answer.
-    回答の文字列から「文字のみ一致」を検出する。
+class Game_VS_SELF(Game):
+    def __init__(self, answer_pokemon: Pokemon) -> None:
+        super().__init__(answer_pokemon)
 
-    Args:
-        remaining (:obj:`list` of :obj:`str`): 完全一致を取り除いた文字の配列
-        answer (str): 回答
+    def move_next_turn(self) -> None:
+        self.round += 1
 
-    Returns:
-        :obj:`list` of :obj:`bool`: その位置の answerの文字が remainingに含まれて
-                いるかどうかを表す配列
-    """
-    is_yellow_list: list[bool] = []
-    for i, c in enumerate(answer):
-        if is_green_list[i]:
-            is_yellow_list.append(False)
-            continue
-        elif c in remaining:
-            is_yellow_list.append(True)
-            remaining[remaining.index(c)] = ""
+    def print_winner(self):
+        print(f"{self.round}手目で正解！")
+        self.finished = True
+
+    def answer_of_this_turn(self) -> str:
+        answer_word = input("> ")
+        return answer_word
+
+
+class AI:
+    def __init__(self, pokemons: list[Pokemon]) -> None:
+        self.answer = ""
+        self.pokemons = pokemons
+
+    def think(self) -> None:
+        choiced_pokemon = random.choice(self.pokemons)
+        self.answer = choiced_pokemon.name
+
+
+class Game_VS_AI(Game):
+    def __init__(self, answer_pokemon: Pokemon, ai: AI) -> None:
+        super().__init__(answer_pokemon)
+        self.is_player_turn = True
+        self.ai = ai
+
+    def move_next_turn(self) -> None:
+        self.is_player_turn = not self.is_player_turn
+        self.round += 1
+
+    def print_winner(self):
+        print(f"{self.round}手目で正解！")
+        if self.is_player_turn:
+            print("コンピュータの勝利！")
         else:
-            is_yellow_list.append(False)
-    return is_yellow_list
+            print("プレイヤーの勝利！")
+        self.finished = True
 
-
-def call_ai(pokemons: list[Pokemon]) -> str:
-    """Have AI answer.
-    AIに回答させる。
-
-    Args:
-        pokemons (:obj:`list` of :obj:`list`): 全ポケモンのリスト
-
-    Returns:
-        str: 回答
-    """
-    choiced_pokemon = random.choice(pokemons)
-    return choiced_pokemon.name
+    def answer_of_this_turn(self) -> str:
+        if self.is_player_turn:
+            answer_word = input("> ")
+        else:
+            self.ai.think()
+            answer_word = self.ai.answer
+        return answer_word
 
 
 def load_pokemons(filepath: str) -> list[Pokemon]:
@@ -153,58 +168,64 @@ def load_pokemons(filepath: str) -> list[Pokemon]:
     return pokemons
 
 
-def main(args: Namespace) -> None:
-    """Main tasks.
+def choice_pokemon(pokemons: list[Pokemon]) -> Pokemon:
+    choiced_pokemon = random.choice(pokemons)
+    return choiced_pokemon
 
-    Args:
-       args (:obj:Namespace): 実行時に渡された引数のリスト
-    """
+
+def is_invalid_answer(answer: str) -> bool:
+    if len(answer) != 5:
+        return True
+
+    re_katakana = re.compile(r'[\u30A1-\u30F4ー]+')
+    if not re_katakana.fullmatch(answer):
+        return True
+    return False
+
+
+def is_systemcommand(word: str) -> bool:
+    if word in [e.value for e in SystemCommand]:
+        return True
+    return False
+
+
+def pokemon_wordle(choiced_pokemon: Pokemon, game: Game) -> None:
+    while not game.finished:
+        answer_word = game.answer_of_this_turn()
+
+        if is_systemcommand(answer_word):
+            game.exec_systemcommand(answer_word)
+            continue
+
+        if is_invalid_answer(answer_word):
+            print("回答はカタカナ5文字で入力してください。")
+            continue
+
+        if answer_word == choiced_pokemon.name:
+            game.print_winner()
+        else:
+            game.print_colored_feedback(answer_word)
+            game.move_next_turn()
+
+
+def main(args: Namespace) -> None:
     filepath: str = args.list
     is_debug: bool = args.debug
     is_vs: bool = args.vs
 
-    pokemons: list[Pokemon] = load_pokemons(filepath)
-    answer_pokemon = random.choice(pokemons)
+    pokemons = load_pokemons(filepath)
+    choiced_pokemon = choice_pokemon(pokemons)
 
     if is_debug:
-        print(answer_pokemon)
+        print(choiced_pokemon)
 
-    cl.init(autoreset=True)
-    print("help: ゲームのルールを表示")
-    print("hint: タイプのヒントを表示")
-    print("quit: 終了\n")
-    answer = ""
-    count = 0
-    is_first_hint = True
-    is_players_turn = True
-    while answer != answer_pokemon.name:
-        if is_players_turn:
-            answer = input("> ")
-        else:
-            print("コンピュータのターンです。")
-            answer = call_ai(pokemons)
-            print("> {}".format(answer))
-        if answer == "quit":
-            print("正解は{}でした。".format(answer_pokemon.name))
-            return
-        elif answer == "help":
-            guide()
-        elif answer == "hint":
-            hint(answer_pokemon, is_first_hint)
-            is_first_hint = False
-        elif len(answer) != 5:
-            print("回答は5文字で入力してください。")
-        else:
-            judge(answer_pokemon.name, answer)
-            count += 1
-            if is_vs:
-                is_players_turn = not is_players_turn
-    print("\n{}手目で正解！".format(count))
     if is_vs:
-        if is_players_turn:
-            print("コンピュータの勝利！")
-        else:
-            print("プレイヤーの勝利！")
+        ai = AI(pokemons)
+        game = Game_VS_AI(choiced_pokemon, ai)
+    else:
+        game = Game_VS_SELF(choiced_pokemon)
+
+    pokemon_wordle(choiced_pokemon, game)
 
 
 def arg_parser() -> Namespace:
