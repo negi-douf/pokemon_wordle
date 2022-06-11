@@ -1,0 +1,30 @@
+[[package]]
+name = "colorama"
+version = "0.4.4"
+description = "Cross-platform colored terminal text."
+category = "main"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+
+[[package]]
+name = "dataclass-csv"
+version = "1.4.0"
+description = "Map CSV data into dataclasses"
+category = "main"
+optional = false
+python-versions = "*"
+
+[metadata]
+lock-version = "1.1"
+python-versions = "^3.9"
+content-hash = "92ed36875de587f714c4d32fde109236f656c49a140ca1bda3b1ee7c1d48fc7c"
+
+[metadata.files]
+colorama = [
+    {file = "colorama-0.4.4-py2.py3-none-any.whl", hash = "sha256:9f47eda37229f68eee03b24b9748937c7dc3868f906e8ba69fbcbdd3bc5dc3e2"},
+    {file = "colorama-0.4.4.tar.gz", hash = "sha256:5941b2b48a20143d2267e95b1c2a7603ce057ee39fd88e7329b0c292aa16869b"},
+]
+dataclass-csv = [
+    {file = "dataclass-csv-1.4.0.tar.gz", hash = "sha256:6a9207537ccdc3f381d50c3f5d053ce5a92ef0d61850f7a159e3f52eb79f0402"},
+    {file = "dataclass_csv-1.4.0-py2.py3-none-any.whl", hash = "sha256:e01e99fa75779bb86ae3b9577a06ffc8632061c03115d6a0823137458bfa3d1c"},
+]
