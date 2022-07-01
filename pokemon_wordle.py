@@ -5,6 +5,7 @@ import re
 from argparse import ArgumentParser, Namespace
 from dataclasses import dataclass
 from enum import Enum, auto
+from typing import Iterable
 
 import colorama
 from dataclass_csv import DataclassReader
@@ -31,7 +32,7 @@ class Color(Enum):
 
 class Game():
     def __init__(self, answer_pokemon: Pokemon) -> None:
-        self.round = 0
+        self.round = 1
         self.is_players_turn = True
         self.is_first_hint = True
         self.answer_pokemon = answer_pokemon
@@ -47,7 +48,7 @@ class Game():
     def print_hint(self) -> None:
         type_01 = self.answer_pokemon.type_01
         type_02 = self.answer_pokemon.type_02
-        if type_02 == '':
+        if type_02 == "":
             type_02 = "なし"
 
         if self.is_first_hint:
@@ -74,25 +75,26 @@ class Game():
         elif word == SystemCommand.HINT.value:
             self.print_hint()
 
-    def print_winner(self):
+    def print_winner(self) -> None:
         pass
 
-    def move_next_turn(self) -> None:
+    def move_to_next_turn(self) -> None:
         pass
 
     def answer_of_this_turn(self) -> str:
-        return ''
+        return ""
 
     def label_yellow(self, answer: str, correct_answer: str) -> list[Color]:
         yellow_labels: list[Color] = []
-        count_moji: dict[str, int] = {}
+
+        num_of_appearances_of_chars: dict[str, int] = {}
         for c in correct_answer:
-            count_moji[c] = correct_answer.count(c)
+            num_of_appearances_of_chars[c] = correct_answer.count(c)
 
         for c in answer:
-            if c in correct_answer and count_moji[c] > 0:
+            if c in correct_answer and num_of_appearances_of_chars[c] > 0:
                 yellow_labels.append(Color.YELLOW)
-                count_moji[c] -= 1
+                num_of_appearances_of_chars[c] -= 1
             else:
                 yellow_labels.append(Color.NONE)
         return yellow_labels
@@ -116,14 +118,14 @@ class Game():
         return color_labels
 
     def _print_colored_feedback(self, color_labels: list[Color], answer: str) -> None:
-        print('  ', end='')
+        print("  ", end="")
         for index, color_label in enumerate(color_labels):
             if color_label == Color.GREEN:
-                print(colorama.Fore.GREEN + answer[index], end='')
+                print(colorama.Fore.GREEN + answer[index], end="")
             elif color_label == Color.YELLOW:
-                print(colorama.Fore.YELLOW + answer[index], end='')
+                print(colorama.Fore.YELLOW + answer[index], end="")
             else:
-                print(colorama.Fore.WHITE + '・', end='')
+                print(colorama.Fore.WHITE + "・", end="")
         print()
 
     def print_colored_feedback(self, answer: str) -> None:
@@ -138,10 +140,10 @@ class SoloPlayGame(Game):
     def __init__(self, answer_pokemon: Pokemon) -> None:
         super().__init__(answer_pokemon)
 
-    def move_next_turn(self) -> None:
+    def move_to_next_turn(self) -> None:
         self.round += 1
 
-    def print_winner(self):
+    def print_winner(self) -> None:
         print(f"{self.round}手目で正解！")
         self.finished = True
 
@@ -165,11 +167,11 @@ class BattleAIGame(Game):
         super().__init__(answer_pokemon)
         self.ai = ai
 
-    def move_next_turn(self) -> None:
+    def move_to_next_turn(self) -> None:
         self.is_players_turn = not self.is_players_turn
         self.round += 1
 
-    def print_winner(self):
+    def print_winner(self) -> None:
         print(f"{self.round}手目で正解！")
         if self.is_players_turn:
             print("プレイヤーの勝利！")
@@ -188,7 +190,7 @@ class BattleAIGame(Game):
 
 def load_pokemons(filepath: str) -> list[Pokemon]:
     with open(filepath, "r", encoding="utf-8") as f:
-        reader = DataclassReader(f, Pokemon)
+        reader: Iterable[Pokemon] = DataclassReader(f, Pokemon)
         pokemons = [row for row in reader]
     return pokemons
 
@@ -202,7 +204,7 @@ def is_invalid_answer(answer: str) -> bool:
     if len(answer) != 5:
         return True
 
-    re_katakana = re.compile(r'[\u30A1-\u30F4ー]+')
+    re_katakana = re.compile(r"[\u30A1-\u30F4ー]+")
     if not re_katakana.fullmatch(answer):
         return True
     return False
@@ -227,13 +229,13 @@ def pokemon_wordle(choiced_pokemon: Pokemon, game: Game) -> None:
             continue
 
         if not game.is_players_turn:
-            print(f'  {answer_word}')
+            print(f"  {answer_word}")
 
         if answer_word == choiced_pokemon.name:
             game.print_winner()
         else:
             game.print_colored_feedback(answer_word)
-            game.move_next_turn()
+            game.move_to_next_turn()
 
 
 def main(args: Namespace) -> None:
@@ -257,7 +259,7 @@ def main(args: Namespace) -> None:
     pokemon_wordle(choiced_pokemon, game)
 
 
-def arg_parser() -> Namespace:
+def parse_args() -> Namespace:
     parser = ArgumentParser(description="5文字のポケモンの名前を当てるゲームです！")
     parser.add_argument("input_filepath", type=str, help="インポートするポケモンリストのファイルパス")
     parser.add_argument("--debug", action="store_true", help="デバッグモードで実行する")
@@ -267,5 +269,5 @@ def arg_parser() -> Namespace:
 
 
 if __name__ == "__main__":
-    args = arg_parser()
+    args = parse_args()
     main(args)
