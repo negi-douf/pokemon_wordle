@@ -85,7 +85,8 @@ class Game():
     def responce_of_this_turn(self) -> str:
         return ""
 
-    def label(self, responce: str, answer: str) -> list[Color]:
+    def label(self, responce: str) -> list[Color]:
+        answer = self.answer_pokemon.name
         labels: list[Color] = []
 
         answer_counter = Counter(answer)
@@ -120,8 +121,7 @@ class Game():
         print()
 
     def print_colored_feedback(self, responce: str) -> None:
-        answer = self.answer_pokemon.name
-        color_labels = self.label(responce, answer)
+        color_labels = self.label(responce)
         self._print_colored_feedback(color_labels, responce)
 
 
