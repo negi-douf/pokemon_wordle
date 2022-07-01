@@ -81,28 +81,28 @@ class Game():
     def move_to_next_turn(self) -> None:
         pass
 
-    def answer_of_this_turn(self) -> str:
+    def responce_of_this_turn(self) -> str:
         return ""
 
-    def label_yellow(self, answer: str, correct_answer: str) -> list[Color]:
+    def label_yellow(self, responce: str, answer: str) -> list[Color]:
         yellow_labels: list[Color] = []
 
         num_of_appearances_of_chars: dict[str, int] = {}
-        for c in correct_answer:
-            num_of_appearances_of_chars[c] = correct_answer.count(c)
-
         for c in answer:
-            if c in correct_answer and num_of_appearances_of_chars[c] > 0:
+            num_of_appearances_of_chars[c] = answer.count(c)
+
+        for c in responce:
+            if c in answer and num_of_appearances_of_chars[c] > 0:
                 yellow_labels.append(Color.YELLOW)
                 num_of_appearances_of_chars[c] -= 1
             else:
                 yellow_labels.append(Color.NONE)
         return yellow_labels
 
-    def label_green(self, answer: str, correct_answer: str) -> list[Color]:
+    def label_green(self, responce: str, answer: str) -> list[Color]:
         green_labels: list[Color] = [Color.NONE] * 5
-        for index, answer_char in enumerate(answer):
-            if answer_char == correct_answer[index]:
+        for index, responce_char in enumerate(responce):
+            if responce_char == answer[index]:
                 green_labels[index] = Color.GREEN
         return green_labels
 
@@ -117,23 +117,23 @@ class Game():
                 color_labels.append(Color.NONE)
         return color_labels
 
-    def _print_colored_feedback(self, color_labels: list[Color], answer: str) -> None:
+    def _print_colored_feedback(self, color_labels: list[Color], responce: str) -> None:
         print("  ", end="")
         for index, color_label in enumerate(color_labels):
             if color_label == Color.GREEN:
-                print(colorama.Fore.GREEN + answer[index], end="")
+                print(colorama.Fore.GREEN + responce[index], end="")
             elif color_label == Color.YELLOW:
-                print(colorama.Fore.YELLOW + answer[index], end="")
+                print(colorama.Fore.YELLOW + responce[index], end="")
             else:
                 print(colorama.Fore.WHITE + "・", end="")
         print()
 
-    def print_colored_feedback(self, answer: str) -> None:
-        correct_answer = self.answer_pokemon.name
-        yellow_labels = self.label_yellow(answer, correct_answer)
-        green_labels = self.label_green(answer, correct_answer)
+    def print_colored_feedback(self, responce: str) -> None:
+        answer = self.answer_pokemon.name
+        yellow_labels = self.label_yellow(responce, answer)
+        green_labels = self.label_green(responce, answer)
         color_labels = self.merge_labels(yellow_labels, green_labels)
-        self._print_colored_feedback(color_labels, answer)
+        self._print_colored_feedback(color_labels, responce)
 
 
 class SoloPlayGame(Game):
@@ -147,19 +147,19 @@ class SoloPlayGame(Game):
         print(f"{self.round}手目で正解！")
         self.finished = True
 
-    def answer_of_this_turn(self) -> str:
-        answer_word = input("> ")
-        return answer_word
+    def responce_of_this_turn(self) -> str:
+        responce_word = input("> ")
+        return responce_word
 
 
 class AI:
     def __init__(self, pokemons: list[Pokemon]) -> None:
-        self.answer = ""
+        self.responce = ""
         self.pokemons = pokemons
 
     def think(self) -> None:
         choiced_pokemon = random.choice(self.pokemons)
-        self.answer = choiced_pokemon.name
+        self.responce = choiced_pokemon.name
 
 
 class BattleAIGame(Game):
@@ -179,13 +179,13 @@ class BattleAIGame(Game):
             print("コンピュータの勝利！")
         self.finished = True
 
-    def answer_of_this_turn(self) -> str:
+    def responce_of_this_turn(self) -> str:
         if self.is_players_turn:
-            answer_word = input("> ")
+            responce_word = input("> ")
         else:
             self.ai.think()
-            answer_word = self.ai.answer
-        return answer_word
+            responce_word = self.ai.responce
+        return responce_word
 
 
 def load_pokemons(filepath: str) -> list[Pokemon]:
@@ -200,12 +200,12 @@ def choice_pokemon(pokemons: list[Pokemon]) -> Pokemon:
     return choiced_pokemon
 
 
-def is_invalid_answer(answer: str) -> bool:
-    if len(answer) != 5:
+def is_invalid_responce(responce: str) -> bool:
+    if len(responce) != 5:
         return True
 
     re_katakana = re.compile(r"[\u30A1-\u30F4ー]+")
-    if not re_katakana.fullmatch(answer):
+    if not re_katakana.fullmatch(responce):
         return True
     return False
 
@@ -216,25 +216,25 @@ def is_system_command(word: str) -> bool:
     return False
 
 
-def pokemon_wordle(choiced_pokemon: Pokemon, game: Game) -> None:
+def pokemon_wordle(answer_pokemon: Pokemon, game: Game) -> None:
     while not game.finished:
-        answer_word = game.answer_of_this_turn()
+        response_word = game.responce_of_this_turn()
 
-        if is_system_command(answer_word):
-            game.exec_system_command(answer_word)
+        if is_system_command(response_word):
+            game.exec_system_command(response_word)
             continue
 
-        if is_invalid_answer(answer_word):
+        if is_invalid_responce(response_word):
             print("回答はカタカナ5文字で入力してください。")
             continue
 
         if not game.is_players_turn:
-            print(f"  {answer_word}")
+            print(f"  {response_word}")
 
-        if answer_word == choiced_pokemon.name:
+        if response_word == answer_pokemon.name:
             game.print_winner()
         else:
-            game.print_colored_feedback(answer_word)
+            game.print_colored_feedback(response_word)
             game.move_to_next_turn()
 
 
