@@ -3,6 +3,7 @@
 import random
 import re
 from argparse import ArgumentParser, Namespace
+from collections import Counter
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Iterable
@@ -84,38 +85,28 @@ class Game():
     def responce_of_this_turn(self) -> str:
         return ""
 
-    def label_yellow(self, responce: str, answer: str) -> list[Color]:
-        yellow_labels: list[Color] = []
+    def label(self, responce: str, answer: str) -> list[Color]:
+        labels: list[Color] = []
 
-        num_of_appearances_of_chars: dict[str, int] = {}
-        for c in answer:
-            num_of_appearances_of_chars[c] = answer.count(c)
+        answer_counter = Counter(answer)
+        responce_counter = Counter(responce)
+        char_set_intersection = set(list(responce)) & set(list(answer))
+        need_to_label_list: list[str] = []
+        for char in char_set_intersection:
+            for _ in range(min(responce_counter[char], answer_counter[char])):
+                need_to_label_list.append(char)
 
-        for c in responce:
-            if c in answer and num_of_appearances_of_chars[c] > 0:
-                yellow_labels.append(Color.YELLOW)
-                num_of_appearances_of_chars[c] -= 1
+        for responce_char, answer_char in zip(responce, answer):
+            if responce_char not in need_to_label_list:
+                labels.append(Color.NONE)
+            elif responce_char == answer_char:
+                labels.append(Color.GREEN)
+                need_to_label_list.remove(responce_char)
             else:
-                yellow_labels.append(Color.NONE)
-        return yellow_labels
+                labels.append(Color.YELLOW)
+                need_to_label_list.remove(responce_char)
 
-    def label_green(self, responce: str, answer: str) -> list[Color]:
-        green_labels: list[Color] = [Color.NONE] * 5
-        for index, responce_char in enumerate(responce):
-            if responce_char == answer[index]:
-                green_labels[index] = Color.GREEN
-        return green_labels
-
-    def merge_labels(self, yellow_labels: list[Color], green_labels: list[Color]) -> list[Color]:
-        color_labels: list[Color] = []
-        for yellow_label, green_label in zip(yellow_labels, green_labels):
-            if green_label == Color.GREEN:
-                color_labels.append(Color.GREEN)
-            elif yellow_label == Color.YELLOW:
-                color_labels.append(Color.YELLOW)
-            else:
-                color_labels.append(Color.NONE)
-        return color_labels
+        return labels
 
     def _print_colored_feedback(self, color_labels: list[Color], responce: str) -> None:
         print("  ", end="")
@@ -130,9 +121,7 @@ class Game():
 
     def print_colored_feedback(self, responce: str) -> None:
         answer = self.answer_pokemon.name
-        yellow_labels = self.label_yellow(responce, answer)
-        green_labels = self.label_green(responce, answer)
-        color_labels = self.merge_labels(yellow_labels, green_labels)
+        color_labels = self.label(responce, answer)
         self._print_colored_feedback(color_labels, responce)
 
 
