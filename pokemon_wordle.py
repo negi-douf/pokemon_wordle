@@ -76,7 +76,7 @@ class ColorLabels:
             if label == Color.WHITE:
                 response_char = "・"
             feedback_str += label.value + response_char
-        feedback_str += '\n'
+        feedback_str += "\n"
         return feedback_str
 
 
