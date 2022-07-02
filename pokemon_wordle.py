@@ -5,7 +5,7 @@ import re
 from argparse import ArgumentParser, Namespace
 from collections import Counter
 from dataclasses import dataclass
-from enum import Enum, auto
+from enum import Enum
 from typing import Iterable
 
 import colorama
@@ -26,9 +26,58 @@ class SystemCommand(Enum):
 
 
 class Color(Enum):
-    GREEN = auto()
-    YELLOW = auto()
-    NONE = auto()
+    GREEN = colorama.Fore.GREEN
+    YELLOW = colorama.Fore.YELLOW
+    WHITE = colorama.Fore.WHITE
+
+
+class ColorLabels:
+    def __init__(self, answer: str, response: str) -> None:
+        self.answer = answer
+        self.response = response
+        self.labels = self._get_color_labels()
+
+    def _get_need_to_label_list(self) -> list[str]:
+        answer = self.answer
+        response = self.response
+        answer_counter = Counter(answer)
+        response_counter = Counter(response)
+        char_set_intersection = set(list(response)) & set(list(answer))
+
+        need_to_label_list: list[str] = []
+        for char in char_set_intersection:
+            for _ in range(min(response_counter[char], answer_counter[char])):
+                need_to_label_list.append(char)
+        return need_to_label_list
+
+    def _get_color_labels(self) -> list[Color]:
+        answer = self.answer
+        response = self.response
+        labels: list[Color] = [Color.WHITE] * 5
+        need_to_label_list = self._get_need_to_label_list()
+
+        for index, (response_char, answer_char) in enumerate(zip(response, answer)):
+            if response_char == answer_char:
+                labels[index] = Color.GREEN
+                need_to_label_list.remove(response_char)
+
+        for index, (response_char, answer_char) in enumerate(zip(response, answer)):
+            if response_char in need_to_label_list:
+                labels[index] = Color.YELLOW
+                need_to_label_list.remove(response_char)
+        return labels
+
+    @property
+    def feedback_str(self) -> str:
+        labels = self.labels
+        response = self.response
+        feedback_str: str = "  "
+        for label, response_char in zip(labels, response):
+            if label == Color.WHITE:
+                response_char = "・"
+            feedback_str += label.value + response_char
+        feedback_str += '\n'
+        return feedback_str
 
 
 class Game():
@@ -68,6 +117,20 @@ class Game():
         print(f"正解は{self.answer_pokemon.name}でした。")
         self.finished = True
 
+    def is_invalid_response(self, response: str) -> bool:
+        if len(response) != 5:
+            return True
+
+        re_katakana = re.compile(r"[\u30A1-\u30F4ー]+")
+        if not re_katakana.fullmatch(response):
+            return True
+        return False
+
+    def is_system_command(self, word: str) -> bool:
+        if word in [e.value for e in SystemCommand]:
+            return True
+        return False
+
     def exec_system_command(self, word: str) -> None:
         if word == SystemCommand.QUIT.value:
             self.quit()
@@ -85,48 +148,9 @@ class Game():
     def response_of_this_turn(self) -> str:
         return ""
 
-    @staticmethod
-    def _get_need_to_label_list(response: str, answer: str) -> list[str]:
-        answer_counter = Counter(answer)
-        response_counter = Counter(response)
-        char_set_intersection = set(list(response)) & set(list(answer))
-        need_to_label_list: list[str] = []
-        for char in char_set_intersection:
-            for _ in range(min(response_counter[char], answer_counter[char])):
-                need_to_label_list.append(char)
-        return need_to_label_list
-
-    def label(self, response: str) -> list[Color]:
-        answer = self.answer_pokemon.name
-        labels: list[Color] = [Color.NONE] * 5
-        need_to_label_list = self._get_need_to_label_list(response, answer)
-
-        for index, (response_char, answer_char) in enumerate(zip(response, answer)):
-            if response_char == answer_char:
-                labels[index] = Color.GREEN
-                need_to_label_list.remove(response_char)
-
-        for index, (response_char, answer_char) in enumerate(zip(response, answer)):
-            if response_char in need_to_label_list:
-                labels[index] = Color.YELLOW
-                need_to_label_list.remove(response_char)
-
-        return labels
-
-    def _print_colored_feedback(self, color_labels: list[Color], response: str) -> None:
-        print("  ", end="")
-        for index, color_label in enumerate(color_labels):
-            if color_label == Color.GREEN:
-                print(colorama.Fore.GREEN + response[index], end="")
-            elif color_label == Color.YELLOW:
-                print(colorama.Fore.YELLOW + response[index], end="")
-            else:
-                print(colorama.Fore.WHITE + "・", end="")
-        print()
-
     def print_colored_feedback(self, response: str) -> None:
-        color_labels = self.label(response)
-        self._print_colored_feedback(color_labels, response)
+        color_labels = ColorLabels(self.answer_pokemon.name, response)
+        print(color_labels.feedback_str)
 
 
 class SoloPlayGame(Game):
@@ -193,31 +217,15 @@ def choice_pokemon(pokemons: list[Pokemon]) -> Pokemon:
     return choiced_pokemon
 
 
-def is_invalid_response(response: str) -> bool:
-    if len(response) != 5:
-        return True
-
-    re_katakana = re.compile(r"[\u30A1-\u30F4ー]+")
-    if not re_katakana.fullmatch(response):
-        return True
-    return False
-
-
-def is_system_command(word: str) -> bool:
-    if word in [e.value for e in SystemCommand]:
-        return True
-    return False
-
-
 def pokemon_wordle(answer_pokemon: Pokemon, game: Game) -> None:
     while not game.finished:
         response_word = game.response_of_this_turn()
 
-        if is_system_command(response_word):
+        if game.is_system_command(response_word):
             game.exec_system_command(response_word)
             continue
 
-        if is_invalid_response(response_word):
+        if game.is_invalid_response(response_word):
             print("回答はカタカナ5文字で入力してください。")
             continue
 
