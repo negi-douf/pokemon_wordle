@@ -85,10 +85,8 @@ class Game():
     def response_of_this_turn(self) -> str:
         return ""
 
-    def label(self, response: str) -> list[Color]:
-        answer = self.answer_pokemon.name
-        labels: list[Color] = []
-
+    @staticmethod
+    def _get_need_to_label_list(response: str, answer: str) -> list[str]:
         answer_counter = Counter(answer)
         response_counter = Counter(response)
         char_set_intersection = set(list(response)) & set(list(answer))
@@ -96,15 +94,21 @@ class Game():
         for char in char_set_intersection:
             for _ in range(min(response_counter[char], answer_counter[char])):
                 need_to_label_list.append(char)
+        return need_to_label_list
 
-        for response_char, answer_char in zip(response, answer):
-            if response_char not in need_to_label_list:
-                labels.append(Color.NONE)
-            elif response_char == answer_char:
-                labels.append(Color.GREEN)
+    def label(self, response: str) -> list[Color]:
+        answer = self.answer_pokemon.name
+        labels: list[Color] = [Color.NONE] * 5
+        need_to_label_list = self._get_need_to_label_list(response, answer)
+
+        for index, (response_char, answer_char) in enumerate(zip(response, answer)):
+            if response_char == answer_char:
+                labels[index] = Color.GREEN
                 need_to_label_list.remove(response_char)
-            else:
-                labels.append(Color.YELLOW)
+
+        for index, (response_char, answer_char) in enumerate(zip(response, answer)):
+            if response_char in need_to_label_list:
+                labels[index] = Color.YELLOW
                 need_to_label_list.remove(response_char)
 
         return labels
