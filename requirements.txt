@@ -1,3 +1,0 @@
-colorama
-dataclass_csv
-pytest
