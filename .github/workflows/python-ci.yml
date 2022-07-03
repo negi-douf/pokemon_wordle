@@ -2,9 +2,9 @@ name: Python CI
 
 on:
   push:
-    branches: [ "add-citest" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "add-citest" ]
+    branches: [ "main" ]
 
 permissions:
   contents: read
