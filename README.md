@@ -4,6 +4,9 @@
 ポケモンWordleが Pythonで遊べるツールです。  
 [@giga_yadoran](https://twitter.com/giga_yadoran)様による Web版は[こちら](https://wordle.mega-yadoran.jp/)。  
 
+## Example
+![demo_play](assets/demo_play.png)
+
 ## Usage
 ```
 python3 pokemon_wordle.py [-h] [--debug] [--vs] list
