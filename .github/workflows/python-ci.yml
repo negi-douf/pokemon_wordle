@@ -17,16 +17,27 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.9.7
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
         python-version: "3.9.7"
-    - name: Install dependencies
+    - name: Upgrade pip
       run: |
         python -m pip install --upgrade pip
-        curl -sSL https://install.python-poetry.org | python3 -
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
-        poetry --version
-        poetry install
+    - name: Install poetry
+      uses: snok/install-poetry@v1
+      with:
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+        installer-parallel: true
+    - name: Load cached venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@3
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+    - name: Install dependencies
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      run: poetry install --no-interction --no-root
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
