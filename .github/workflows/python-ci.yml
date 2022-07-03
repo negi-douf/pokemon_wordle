@@ -25,7 +25,6 @@ jobs:
         python -m pip install --upgrade pip
         curl -sSL https://install.python-poetry.org | python3 -
         echo "$HOME/.local/bin" >> $GITHUB_PATH
-        source "$HOME/.local/bin"
         poetry --version
         poetry install
     - name: Lint with flake8
