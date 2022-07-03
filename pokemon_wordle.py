@@ -62,7 +62,7 @@ class ColorLabels:
                 need_to_label_list.remove(response_char)
 
         for index, (response_char, answer_char) in enumerate(zip(response, answer)):
-            if response_char in need_to_label_list:
+            if labels[index] != Color.GREEN and response_char in need_to_label_list:
                 labels[index] = Color.YELLOW
                 need_to_label_list.remove(response_char)
         return labels
