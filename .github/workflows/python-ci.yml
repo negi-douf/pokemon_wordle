@@ -26,6 +26,7 @@ jobs:
         curl -sSL https://install.python-poetry.org | python3 -
         echo "$HOME/.local/bin" >> $GITHUB_PATH
         source "$HOME/.local/env"
+        poetry --version
         poetry install
     - name: Lint with flake8
       run: |
