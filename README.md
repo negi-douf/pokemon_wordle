@@ -7,6 +7,11 @@
 ## Example
 ![demo_play](assets/images/demo_play.png)
 
+## Setup
+```
+poetry install
+```
+
 ## Usage
 ```
 poetry run python3 pokemon_wordle.py [-h] [--debug] [--vs] list
