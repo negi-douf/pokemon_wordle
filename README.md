@@ -1,5 +1,7 @@
 # pokemon_wordle
 
+![test](https://github.com/negi-douf/pokemon_wordle/actions/workflows/python-ci.yml/badge.svg)
+
 ## Overview
 
 ポケモンWordleが Pythonで遊べるツールです。  
