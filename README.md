@@ -1,7 +1,5 @@
 # pokemon_wordle
 
-![test](https://github.com/negi-douf/pokemon_wordle/actions/workflows/python-ci.yml/badge.svg)
-
 ## Overview
 ポケモンWordleが Pythonで遊べるツールです。  
 [@giga_yadoran](https://twitter.com/giga_yadoran)様による Web版は[こちら](https://wordle.mega-yadoran.jp/)。  
@@ -11,7 +9,7 @@
 
 ## Usage
 ```
-python3 pokemon_wordle.py [-h] [--debug] [--vs] list
+poetry run python pokemon_wordle.py [-h] [--debug] [--vs] list
 ```
 
 ### Args
