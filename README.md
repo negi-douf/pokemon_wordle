@@ -1,13 +1,22 @@
 # pokemon_wordle
 
 ## Overview
+
 ポケモンWordleが Pythonで遊べるツールです。  
 [@giga_yadoran](https://twitter.com/giga_yadoran)様による Web版は[こちら](https://wordle.mega-yadoran.jp/)。  
 
 ## Example
-![demo_play](assets/demo_play.png)
+
+![demo_play](assets/images/demo_play.png)
+
+## Setup
+
+```
+poetry install
+```
 
 ## Usage
+
 ```
 poetry run start [-h] [--debug] [--vs] input_filepath
 ```
@@ -29,4 +38,5 @@ optional arguments:
 ```
 
 ## Other
+
 このツールは個人が開発したものであり、株式会社ポケモン様をはじめとした公式団体とは一切関係ありません。

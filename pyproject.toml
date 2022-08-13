@@ -8,8 +8,11 @@ authors = ["kouya.hirata <atarih.ayuok@gmail.com>"]
 python = "^3.9"
 colorama = "^0.4.4"
 dataclass-csv = "^1.4.0"
+pytest = "^7.1.2"
 
 [tool.poetry.dev-dependencies]
+autopep8 = "^1.6.0"
+flake8 = "^4.0.1"
 
 [tool.poetry.scripts]
 start = "pokemon_wordle:main"
