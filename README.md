@@ -18,24 +18,24 @@ poetry install
 ## Usage
 
 ```
-poetry run python pokemon_wordle.py [-h] [--debug] [--vs] list
+poetry run start [-h] [--debug] [--vs] input_filepath
 ```
 
-### Args
+### Help
+```
+> poetry run start --help
+usage: start [-h] [--debug] [--vs] input_filepath
 
-必須の引数は以下の通りです。
+5文字のポケモンの名前を当てるゲームです！
 
-* list  
-ポケモンのリスト (csvファイルのパス)
+positional arguments:
+  input_filepath  インポートするポケモンリストのファイルパス
 
-### Options
-
-オプションは以下の通りです。
-
-* --debug  
-このフラグを付けて実行した場合、実行時に正解を表示します。
-* --vs  
-このフラグを付けて実行した場合、コンピュータとの対戦モードで実行します。
+optional arguments:
+  -h, --help      show this help message and exit
+  --debug         デバッグモードで実行する
+  --vs            コンピュータとの対戦モードで実行する
+```
 
 ## Other
 

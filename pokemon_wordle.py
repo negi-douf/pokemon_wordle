@@ -239,7 +239,17 @@ def pokemon_wordle(answer_pokemon: Pokemon, game: Game) -> None:
             game.move_to_next_turn()
 
 
-def main(args: Namespace) -> None:
+def parse_args() -> Namespace:
+    parser = ArgumentParser(description="5文字のポケモンの名前を当てるゲームです！")
+    parser.add_argument("input_filepath", type=str, help="インポートするポケモンリストのファイルパス")
+    parser.add_argument("--debug", action="store_true", help="デバッグモードで実行する")
+    parser.add_argument("--vs", action="store_true", help="コンピュータとの対戦モードで実行する")
+    args = parser.parse_args()
+    return args
+
+
+def main() -> None:
+    args = parse_args()
     filepath: str = args.input_filepath
     is_debug: bool = args.debug
     is_vs: bool = args.vs
@@ -260,15 +270,5 @@ def main(args: Namespace) -> None:
     pokemon_wordle(choiced_pokemon, game)
 
 
-def parse_args() -> Namespace:
-    parser = ArgumentParser(description="5文字のポケモンの名前を当てるゲームです！")
-    parser.add_argument("input_filepath", type=str, help="インポートするポケモンリストのファイルパス")
-    parser.add_argument("--debug", action="store_true", help="デバッグモードで実行する")
-    parser.add_argument("--vs", action="store_true", help="コンピュータとの対戦モードで実行する")
-    args = parser.parse_args()
-    return args
-
-
 if __name__ == "__main__":
-    args = parse_args()
-    main(args)
+    main()
