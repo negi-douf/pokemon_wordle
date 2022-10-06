@@ -1,3 +1,5 @@
+![test](https://github.com/negi-douf/pokemon_wordle/actions/workflows/python-ci.yml/badge.svg)
+
 # pokemon_wordle
 
 ## Overview
