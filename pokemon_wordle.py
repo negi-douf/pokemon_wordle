@@ -2,6 +2,7 @@
 
 import random
 import re
+import readline
 from argparse import ArgumentParser, Namespace
 from collections import Counter
 from dataclasses import dataclass
